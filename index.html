@@ -3,277 +3,336 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DASHBOARD KEUANGAN RT 04 RW 01 LATSARI</title>
+<title>DASHBOARD KEUANGAN RT 04 RW 01 LATSARI , TUBAN</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
+:root{
   --green:#00ff88;
-  --dark:#222;
-  --light:#fff;
-  --gray:#ddd;
+  --muted:#aaa;
+  --bg:#0f0f0f;
+  --panel:#1a1a1a;
+  --accent:#00cc66;
 }
 body {
-  font-family:'Poppins',sans-serif;
-  background:#111;
-  color:#fff;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg);
+  color: #f1f1f1;
   margin:0;
-  padding:0;
+  padding:12px;
+}
+h1 {
+  text-align:center;
+  color:var(--green);
+  margin-bottom:10px;
+  font-size:1.2rem;
 }
 #menu {
   display:flex;
-  flex-wrap:wrap;
   justify-content:center;
-  background:#222;
-  padding:10px;
-  gap:8px;
+  gap:10px;
+  margin-bottom:10px;
+  flex-wrap:wrap;
 }
 #menu button {
-  background:#333;
+  padding:6px 12px;
   border:none;
-  color:#fff;
-  padding:10px 14px;
-  border-radius:8px;
-  cursor:pointer;
+  border-radius:6px;
   font-weight:600;
-  transition:0.2s;
-}
-#menu button.active {
-  background:var(--green);
+  cursor:pointer;
+  transition:0.15s;
+  background:var(--accent);
   color:#000;
 }
-#menu button:hover { background:#00cc66; }
+#menu button.active { 
+  background: #00ff88;
+  color: #000;
+  font-weight: 700;
+}
+#menu button:hover { 
+  background: #00cc66;
+  color: #fff;
+}
 
+.filter-container {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:10px;
+  align-items:center;
+}
+.filter-container label {
+  color:#ddd;
+  font-size:0.85rem;
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+.filter-container input[type="date"], .filter-container input[type="text"], .filter-container button {
+  padding:6px 8px;
+  border-radius:6px;
+  border:1px solid #333;
+  background:var(--panel);
+  color:#fff;
+  font-size:0.9rem;
+}
+.filter-container input[type="text"]{ min-width:200px; }
+.filter-container button { background:var(--accent); color:#000; font-weight:600; cursor:pointer; }
+.filter-container button:hover{ background:var(--green); }
+
+.table-wrapper {
+  overflow-x:auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom:10px;
+  border-radius:6px;
+  width: 100%;
+}
 table {
   width:100%;
   border-collapse:collapse;
-  margin-top:10px;
+  table-layout:auto;
 }
-th,td {
-  border:1px solid #333;
-  padding:6px;
-  text-align:center;
-}
-th {
-  background:#00ff8844;
-  color:#fff;
-}
-tr:nth-child(even){background:#222;}
-tr:hover {background:#333;}
-img {
-  width:70px;
-  border-radius:6px;
-}
-.pagination {
-  display:flex;
-  justify-content:center;
-  margin:12px 0;
-  gap:10px;
-}
-.pagination button {
-  background:#333;
-  border:none;
-  color:#fff;
-  padding:6px 12px;
-  border-radius:6px;
-  cursor:pointer;
-}
-.pagination button.active {
-  background:var(--green);
-  color:#000;
-  font-weight:700;
-}
-#searchInput {
-  width:95%;
-  max-width:400px;
-  margin:12px auto;
-  display:block;
+th, td {
   padding:8px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-  font-size:15px;
+  font-size:0.85rem;
+  border-bottom:1px solid #333;
+  text-align:center;
+  vertical-align:middle;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
-.highlight {
-  background:yellow;
-  color:#000;
-  font-weight:bold;
+th { background-color:var(--accent); color:#000; font-weight:700; }
+td.foto img { max-width:60px; max-height:50px; border-radius:4px; display:block; margin:auto; }
+tr:nth-child(even){background:#171717;}
+tr:hover{background:#222;}
+
+.highlight{background:#00ff44;color:#000;font-weight:700;border-radius:3px;padding:0 3px;}
+td.nominal-cell { color: var(--green) !important; font-weight:700; }
+
+th:nth-child(1), td:nth-child(1) { width:2%; min-width:40px; max-width:60px; }
+th:nth-child(2), td:nth-child(2),
+th:nth-child(3), td:nth-child(3) { width:8%; min-width:80px; max-width:100px; }
+th:nth-child(4), td:nth-child(4),
+th:nth-child(5), td:nth-child(5),
+th:nth-child(6), td:nth-child(6) { width:14%; min-width:140px; word-break: break-word; }
+th:nth-child(7), td:nth-child(7) { width:7%; min-width:80px; max-width:100px; }
+
+.pagination{display:flex; justify-content:center; flex-wrap:wrap; gap:6px; margin-top:8px;}
+.pagination button{padding:6px 8px; border-radius:6px; font-size:0.85rem; background:#222; color:#ddd; border:1px solid #333;}
+.pagination button.active{background:var(--green); color:#000; transform:scale(1.05);}
+.pagination button:disabled{background:#333;color:#777; cursor:not-allowed;}
+
+#update-time {text-align:center; color:var(--muted); font-size:0.78rem; margin-bottom:6px;}
+#total-container { text-align:center; margin-top:6px; font-weight:700; color:var(--green); }
+footer { text-align:center; font-size:11px; color:#777; margin-top:12px; }
+
+.loader { border: 3px solid #333; border-top: 3px solid var(--green); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin:auto; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+@media(max-width:600px){
+  .filter-container input[type="text"]{ min-width:120px; }
+  th, td { padding:6px 4px; font-size:0.75rem; }
 }
-.nominal-cell { text-align:right; }
+@media(max-width:400px){
+  h1 { font-size:1rem; }
+  #menu button { font-size:0.75rem; padding:3px 6px; }
+}
+
+body.rekap-active table#main-table {
+  table-layout: fixed;
+}
+body.rekap-active table#main-table th:nth-child(1),
+body.rekap-active table#main-table td:nth-child(1) {
+  width: 70%;
+  text-align: left;
+}
+body.rekap-active table#main-table th:nth-child(2),
+body.rekap-active table#main-table td:nth-child(2) {
+  width: 30%;
+  text-align: right;
+}
 </style>
 </head>
 <body>
-
-<h2 style="text-align:center;margin-top:15px;">DASHBOARD KEUANGAN RT 04 RW 01 LATSARI</h2>
+<h1>DASHBOARD KEUANGAN RT 04 RW 01 LATSARI , TUBAN</h1>
 
 <div id="menu">
-  <button data-sheet="hariini">Hari Ini</button>
   <button class="active" data-sheet="harian">Jimpitan Harian</button>
+  <button data-sheet="hariini">Hari Ini</button>
   <button data-sheet="bulanan">Warga Bulanan</button>
   <button data-sheet="pengeluaran">Pengeluaran</button>
   <button data-sheet="rekap">Rekap Keuangan</button>
 </div>
 
-<input type="text" id="searchInput" placeholder="Cari data..." />
+<div id="update-time">Diperbarui otomatis: ⏳</div>
 
-<div id="tableContainer"></div>
+<div class="filter-container">
+  <label>Dari: <input type="date" id="startDate"></label>
+  <label>Sampai: <input type="date" id="endDate"></label>
+  <input type="text" id="searchBox" placeholder="🔎 Cari semua kolom..." />
+  <button id="resetBtn">🔄 Reset</button>
+  <button id="pdfBtn">📄 Export PDF</button>
+</div>
+
+<div class="table-wrapper">
+  <table id="main-table" role="table" aria-label="Data keuangan">
+    <thead id="table-head"></thead>
+    <tbody id="table-body"><tr><td colspan="8"><div class="loader"></div></td></tr></tbody>
+  </table>
+</div>
+
+<div id="total-container"></div>
 <div class="pagination" id="pagination"></div>
+<footer>Data otomatis diperbarui dari Google Sheet</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-const sheetsConfig={
-  hariini:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Laporan Jimpitan Harian",
-    columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN","UPDATE"],
-    query:"SELECT A,B,C,E,F,G,H,I",
-    rowsPerPage:1
-  },
-  harian:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Laporan Jimpitan Harian",
-    columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN","FOTO"],
-    query:"SELECT A,B,C,E,F,G,H,I",
-    rowsPerPage:5
-  },
-  bulanan:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Laporan Warga Bulanan",
-    columns:["NO","NAMA","BLN","JIMPITAN (Rp)","LAINNYA (Rp)","TOTAL (Rp)"],
-    query:"SELECT A,B,C,D,E,F",
-    rowsPerPage:10
-  },
-  pengeluaran:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Laporan Pengeluaran",
-    columns:["NO","TANGGAL","KEPERLUAN","NOMINAL (Rp)","KETERANGAN","FOTO"],
-    query:"SELECT A,B,C,D,E,F",
-    rowsPerPage:5
-  },
-  rekap:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Rekapitulasi Keuangan",
-    columns:["NO","URAIAN","DEBET (Rp)","KREDIT (Rp)","SALDO (Rp)"],
-    query:"SELECT A,B,C,D,E",
-    rowsPerPage:10
-  }
+const sheetsConfig = {
+  harian:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Jimpitan Harian", columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"], query:"SELECT A,B,C,E,F,G,H,I", rowsPerPage:10 },
+  hariini:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Jimpitan Harian", columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"], query:"SELECT A,B,C,E,F,G,H,I", rowsPerPage:10 },
+  bulanan:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Warga Bulanan", columns:["NO","TANGGAL","NAMA WARGA","PERIODE BAYAR","NOMINAL (Rp)","KETERANGAN","FOTO"], query:"SELECT A,B,C,D,E,F,G", rowsPerPage:10 },
+  pengeluaran:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Pengeluaran", columns:["NO","TANGGAL","KEPERLUAN","NOMINAL (Rp)","KETERANGAN","FOTO"], query:"SELECT A,B,C,D,E,F", rowsPerPage:10 },
+  rekap:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Rekap Keuangan RT", columns:["DESKRIPSI","JUMLAH"], query:"SELECT A,B", rowsPerPage:1000 }
 };
 
-let currentSheet="harian";
-let allData=[],filteredData=[];
-let currentPage=1,currentKeyword="";
+let currentSheet="harian", allData=[], filteredData=[], currentPage=1, currentKeyword="";
 
-async function fetchData(){
+function parseDate(val){ if(!val) return {text:"", raw:null}; if(typeof val==="string" && val.startsWith("Date(")){ const m=val.match(/Date\((\d+),(\d+),(\d+)/); if(m){ const d=new Date(Number(m[1]),Number(m[2]),Number(m[3])); return formatDateObj(d); } } if(/^\d{4}-\d{2}-\d{2}$/.test(val)){ return formatDateObj(new Date(val)); } if(/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(val)){ const [dd,mm,yy]=val.split(/[-/]/); return formatDateObj(new Date(`${yy}-${mm}-${dd}`)); } return formatDateObj(new Date(val)); }
+function formatDateObj(d){ if(!d||isNaN(d)) return {text:"", raw:null}; const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yy=d.getFullYear(); return {text:`${dd}-${mm}-${yy}`, raw:d}; }
+function formatRupiah(val){ if(val===null||val===undefined||val==="") return "-"; const num=Number(String(val).replace(/[^0-9]/g,"")); return isNaN(num)?val:"Rp. "+num.toLocaleString("id-ID")+",-"; }
+
+function showLoading(){ const cols=sheetsConfig[currentSheet].columns.length||8; document.getElementById("table-body").innerHTML=`<tr><td colspan="${cols}"><div class="loader"></div></td></tr>`; }
+
+function fetchData(){
+  showLoading(); currentKeyword=""; document.getElementById("searchBox").value="";
   const cfg=sheetsConfig[currentSheet];
-  const url=`https://docs.google.com/spreadsheets/d/${cfg.sheetId}/gviz/tq?tq=${encodeURIComponent(cfg.query)}&sheet=${encodeURIComponent(cfg.sheetName)}`;
-  const res=await fetch(url);
-  const txt=await res.text();
-  const json=JSON.parse(txt.substr(47).slice(0,-2));
-  const cols=json.table.cols.map(c=>c.label);
-  allData=json.table.rows.map(r=>{
-    const o={};
-    cols.forEach((c,i)=>{ o[c.toUpperCase()]=r.c[i]?r.c[i].v:""; });
-    if(o["TANGGAL"]) o["TANGGALOBJ"]=new Date(o["TANGGAL"]);
-    return o;
+  const url=`https://docs.google.com/spreadsheets/d/${cfg.sheetId}/gviz/tq?sheet=${encodeURIComponent(cfg.sheetName)}&tq=${encodeURIComponent(cfg.query)}`;
+  fetch(url).then(r=>r.text()).then(rep=>{
+    try{
+      const json=JSON.parse(rep.match(/google\.visualization\.Query\.setResponse\((.*)\)/)[1]);
+      const rows=json.table.rows.map(r=>r.c.map(c=>c?v=c.v:""));
+      allData=rows.map(r=>{
+        const t=parseDate(r[1]); let obj={};
+        cfg.columns.forEach((col,idx)=> obj[col.toUpperCase()]=r[idx]||"");
+        if(obj["TANGGAL"]) obj["TANGGALOBJ"]=t.raw;
+        if(obj["TANGGAL"]) obj["TANGGAL"]=t.text||obj["TANGGAL"];
+        if(obj["JUMLAH"]) obj["JUMLAH"]=formatRupiah(obj["JUMLAH"]);
+        if(obj["HASIL (RP)"]) obj["HASIL (RP)"]=formatRupiah(obj["HASIL (RP)"]);
+        if(obj["NOMINAL (RP)"]) obj["NOMINAL (RP)"]=formatRupiah(obj["NOMINAL (RP)"]);
+        return obj;
+      });
+
+      // Jika menu "Hari Ini", tampilkan hanya baris dengan NO tertinggi
+      if(currentSheet==="hariini" && allData.length>0){
+        const maxNo = Math.max(...allData.map(d=>Number(d["NO"])||0));
+        allData = allData.filter(d=>Number(d["NO"])===maxNo);
+      }
+
+      allData.sort((a,b)=>{ const da=a["TANGGALOBJ"],db=b["TANGGALOBJ"]; if(!da&&!db) return 0; if(!da) return 1; if(!db) return -1; return db-da; });
+      filteredData=allData;
+      toggleDateInputs(currentSheet==="rekap" || currentSheet==="hariini");
+      renderTable();
+      const now=new Date();
+      document.getElementById("update-time").textContent="Diperbarui otomatis: "+now.toLocaleString("id-ID",{ weekday:"short", day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"});
+    }catch(e){
+      document.getElementById("table-body").innerHTML=`<tr><td colspan="${cfg.columns.length}">❌ Gagal memuat data</td></tr>`; console.error(e);
+    }
+  }).catch(err=>{
+    document.getElementById("table-body").innerHTML=`<tr><td colspan="${cfg.columns.length}">⚠️ Tidak dapat mengambil data</td></tr>`; console.error(err);
   });
-  renderTable();
 }
 
-function highlightText(text,keyword){
-  if(!keyword) return text;
-  const reg=new RegExp(`(${keyword})`,"gi");
-  return text.replace(reg,"<span class='highlight'>$1</span>");
-}
+function toggleDateInputs(disable){ const s=document.getElementById("startDate"), e=document.getElementById("endDate"); if(disable){ s.value=""; e.value=""; s.disabled=true; e.disabled=true; s.style.opacity=0.6; e.style.opacity=0.6; } else{ s.disabled=false; e.disabled=false; s.style.opacity=1; e.style.opacity=1; } }
 
 function getFilteredData(){
-  if(!currentKeyword) return [...allData];
-  const kw=currentKeyword.toLowerCase();
-  return allData.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(kw)));
+  const sDate=document.getElementById("startDate").value;
+  const eDate=document.getElementById("endDate").value;
+  const start=sDate?new Date(sDate+"T00:00:00"):null;
+  const end=eDate?new Date(eDate+"T23:59:59"):null;
+  const keyword=currentKeyword.trim().toLowerCase();
+  return allData.filter(row=>{
+    const tgl=row["TANGGALOBJ"] instanceof Date?row["TANGGALOBJ"]:null;
+    let matchDate=true;
+    if(start&&tgl) matchDate=tgl>=start;
+    if(end&&tgl) matchDate=matchDate&&tgl<=end;
+    const matchText=keyword?Object.values(row).some(v=>String(v).toLowerCase().includes(keyword)):true;
+    return matchDate&&matchText;
+  });
 }
 
 function renderTable(){
+  filteredData=getFilteredData();
   const cfg=sheetsConfig[currentSheet];
+  const thead=document.getElementById("table-head");
+  const tbody=document.getElementById("table-body");
+  tbody.innerHTML=""; thead.innerHTML="";
+  const trh=document.createElement("tr");
+  cfg.columns.forEach(c=>{ const th=document.createElement("th"); th.textContent=c; trh.appendChild(th); });
+  thead.appendChild(trh);
 
-  if(currentSheet==="hariini"){
-    allData.sort((a,b)=>{
-      const da=a["TANGGALOBJ"], db=b["TANGGALOBJ"];
-      if(!da&&!db) return 0;
-      if(!da) return 1;
-      if(!db) return -1;
-      return db - da;
-    });
-    filteredData=allData.slice(0,1);
-  } else {
-    filteredData=getFilteredData();
-  }
+  const view=filteredData;
+  if(view.length===0){ tbody.innerHTML=`<tr><td colspan="${cfg.columns.length}">Tidak ada data</td></tr>`; document.getElementById("pagination").innerHTML=""; document.getElementById("total-container").textContent=""; return; }
 
-  const container=document.getElementById("tableContainer");
-  if(filteredData.length===0){
-    container.innerHTML="<p style='text-align:center;'>Tidak ada data.</p>";
-    document.getElementById("pagination").innerHTML="";
-    return;
-  }
-
-  const start=(currentPage-1)*cfg.rowsPerPage;
-  const pageData=filteredData.slice(start,start+cfg.rowsPerPage);
-
-  let html="<table><thead><tr>";
-  cfg.columns.forEach(c=>html+=`<th>${c}</th>`);
-  html+="</tr></thead><tbody>";
-
-  pageData.forEach(row=>{
-    html+="<tr>";
-    cfg.columns.forEach(col=>{
+  view.forEach(row=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=cfg.columns.map(col=>{
       const key=col.toUpperCase();
       let val=row[key]||"";
       let cls="";
-      if(["HASIL (RP)","NOMINAL (RP)","DEBET (RP)","KREDIT (RP)","SALDO (RP)","TOTAL (RP)"].includes(key))
-        cls="nominal-cell";
-      if(["HADIR","IZIN","ALPHA"].includes(key)&&val)
-        val=val.split("\n").map(l=>l.trim()).filter(Boolean).join("<br>");
-      if(key==="FOTO"&&val) val=`<img src='${val}' alt='Foto'>`;
-      else val=highlightText(String(val),currentKeyword);
-
-      if(currentSheet==="hariini" && key==="UPDATE"){
-        const now=new Date();
-        val=now.toLocaleString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-      }
-
-      html+=`<td class='${cls}'>${val}</td>`;
-    });
-    html+="</tr>";
+      if(["HASIL (RP)","NOMINAL (RP)","JUMLAH"].includes(key)) cls="nominal-cell";
+      if(key==="FOTO"&&val) val=`<img src="${val}" alt="Foto">`; else val=highlightText(String(val),currentKeyword);
+      return `<td class="${cls}">${val}</td>`;
+    }).join("");
+    tbody.appendChild(tr);
   });
 
-  html+="</tbody></table>";
-  container.innerHTML=html;
-
-  const totalPages=Math.ceil(filteredData.length/cfg.rowsPerPage);
-  let pg="";
-  if(totalPages>1){
-    for(let i=1;i<=totalPages;i++){
-      pg+=`<button class='${i===currentPage?"active":""}' onclick='gotoPage(${i})'>${i}</button>`;
-    }
+  if(["harian","bulanan","pengeluaran","hariini"].includes(currentSheet)){
+    const sum=filteredData.reduce((acc,row)=>{ const rawVal=(row["HASIL (RP)"]||row["NOMINAL (RP)"]||row["JUMLAH"])||""; const num=Number(String(rawVal).replace(/[^0-9]/g,"")); return acc+(isNaN(num)?0:num); },0);
+    document.getElementById("total-container").textContent="Total: "+formatRupiah(sum);
+  }else{
+    document.getElementById("total-container").textContent="";
   }
-  document.getElementById("pagination").innerHTML=pg;
+
+  document.body.classList.toggle("rekap-active", currentSheet==="rekap");
 }
 
-function gotoPage(n){currentPage=n;renderTable();}
-document.querySelectorAll("#menu button").forEach(btn=>{
-  btn.onclick=()=>{
+function highlightText(text,keyword){ if(!keyword) return text; const re=new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})`,"gi"); return text.replace(re,'<span class="highlight">$1</span>'); }
+
+document.getElementById("menu").addEventListener("click",e=>{
+  if(e.target.tagName==="BUTTON"){
     document.querySelectorAll("#menu button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    currentSheet=btn.getAttribute("data-sheet");
+    e.target.classList.add("active");
+    currentSheet=e.target.dataset.sheet;
     currentPage=1;
     fetchData();
-  };
+  }
 });
+document.getElementById("searchBox").addEventListener("input",e=>{ currentKeyword=e.target.value; renderTable(); });
+document.getElementById("startDate").addEventListener("change",renderTable);
+document.getElementById("endDate").addEventListener("change",renderTable);
+document.getElementById("resetBtn").addEventListener("click",()=>{ document.getElementById("startDate").value=""; document.getElementById("endDate").value=""; document.getElementById("searchBox").value=""; currentKeyword=""; renderTable(); });
 
-document.getElementById("searchInput").addEventListener("input",e=>{
-  currentKeyword=e.target.value.trim();
-  currentPage=1;
-  renderTable();
+document.getElementById("pdfBtn").addEventListener("click",()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "landscape" });
+  const cfg = sheetsConfig[currentSheet];
+  const title = document.querySelector("#menu button.active").textContent;
+  doc.setFontSize(14);
+  doc.text(title, 14, 15);
+  doc.autoTable({
+    startY: 20,
+    head: [cfg.columns],
+    body: filteredData.map(r => cfg.columns.map(c => String(r[c.toUpperCase()]||""))),
+    styles: { fontSize: 8 },
+  });
+  const nowStr = new Date().toLocaleDateString("id-ID").replace(/\//g,"-");
+  doc.save(`${title.replace(/\s/g,"_")}_${nowStr}.pdf`);
 });
 
 fetchData();
+setInterval(fetchData,300000);
 </script>
-
 </body>
 </html>
