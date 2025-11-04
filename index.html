@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DASHBOARD RT 04 RW 01 LATSARI</title>
+<title>DASHBOARD RT 04 RW 01 LATSARI,TUBAN</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -94,9 +94,8 @@ button.export:hover {
 </style>
 </head>
 <body>
-<h2>DASHBOARD RT 04 RW 01 LATSARI</h2>
+<h2>DASHBOARD RT 04 RW 01 LATSARI,TUBAN</h2>
 
-<!-- Menu navigasi -->
 <div id="menu">
   <button class="active" data-sheet="hariini">Hari Ini</button>
   <button data-sheet="harian">Jimpitan Harian</button>
@@ -128,19 +127,48 @@ const SHEET_URLS = {
 
 let currentSheet="hariini", allData=[], filteredData=[], currentKeyword="";
 
-// 🔄 Ambil data dari CSV Google Sheets
+// Fungsi parsing CSV agar tahan koma di dalam tanda kutip
+function parseCSV(text){
+  const rows = [];
+  let row = [], insideQuote = false, cell = "";
+  for(let i=0; i<text.length; i++){
+    const c = text[i];
+    if(c === '"'){
+      insideQuote = !insideQuote;
+    } else if(c === ',' && !insideQuote){
+      row.push(cell.trim());
+      cell = "";
+    } else if((c === '\n' || c === '\r') && !insideQuote){
+      if(cell || row.length){
+        row.push(cell.trim());
+        rows.push(row);
+        row = [];
+        cell = "";
+      }
+    } else {
+      cell += c;
+    }
+  }
+  if(cell || row.length) row.push(cell.trim()), rows.push(row);
+  return rows.filter(r => r.join("").trim() !== "");
+}
+
+// Ambil data CSV dan tampilkan
 async function fetchData(){
   const url = SHEET_URLS[currentSheet];
   const res = await fetch(url);
   const text = await res.text();
-  const rows = text.trim().split("\n").map(r=>r.split(","));
+  const rows = parseCSV(text);
+  if(rows.length === 0){ 
+    document.querySelector("#dataTable tbody").innerHTML = "<tr><td>Data tidak ditemukan</td></tr>"; 
+    return;
+  }
   const headers = rows[0];
   allData = rows.slice(1).map(r=>{
     let obj={}; headers.forEach((h,i)=>obj[h.trim()]=r[i]?.trim()||""); 
     return obj;
   });
 
-  // jika "Hari Ini" => ambil NO terbesar
   if(currentSheet==="hariini" && allData.length>0){
     const maxNo = Math.max(...allData.map(d=>Number(d["NO"])||0));
     allData = allData.filter(d=>Number(d["NO"])===maxNo);
@@ -150,30 +178,31 @@ async function fetchData(){
   document.getElementById("lastUpdate").textContent = new Date().toLocaleString("id-ID");
 }
 
-// 🧾 Tampilkan tabel
+// Render tabel
 function renderTable(data){
   filteredData = data.filter(row => Object.values(row).join(" ").toLowerCase().includes(currentKeyword.toLowerCase()));
   const table = document.getElementById("dataTable");
   const keys = Object.keys(data[0] || {});
+  if(keys.length===0){ 
+    table.querySelector("thead").innerHTML = "";
+    table.querySelector("tbody").innerHTML = "<tr><td>Data kosong</td></tr>";
+    return;
+  }
   table.querySelector("thead").innerHTML = `<tr>${keys.map(k=>`<th>${k}</th>`).join("")}</tr>`;
   table.querySelector("tbody").innerHTML = filteredData.map(row=>`<tr>${keys.map(k=>`<td>${row[k]}</td>`).join("")}</tr>`).join("");
-  
-  // total rupiah jika ada kolom "NOMINAL (Rp)"
   if(keys.includes("NOMINAL (Rp)")){
     const total = filteredData.reduce((a,b)=>a+(Number(b["NOMINAL (Rp)"].replace(/[^0-9]/g,""))||0),0);
     table.querySelector("tfoot").innerHTML = `<tr><td colspan="${keys.length}">TOTAL: Rp ${total.toLocaleString("id-ID")}</td></tr>`;
-  } else {
-    table.querySelector("tfoot").innerHTML = "";
-  }
+  } else table.querySelector("tfoot").innerHTML = "";
 }
 
-// 🔍 Pencarian otomatis
+// Pencarian otomatis
 document.getElementById("search").addEventListener("input", e=>{
   currentKeyword = e.target.value;
   renderTable(allData);
 });
 
-// 📅 Ganti sheet
+// Ganti menu
 document.querySelectorAll("#menu button").forEach(btn=>{
   btn.onclick = ()=>{
     document.querySelectorAll("#menu button").forEach(b=>b.classList.remove("active"));
@@ -183,12 +212,12 @@ document.querySelectorAll("#menu button").forEach(btn=>{
   };
 });
 
-// ⏰ Jam realtime
+// Jam realtime
 setInterval(()=>{
   document.getElementById("clock").textContent = new Date().toLocaleTimeString("id-ID");
 },1000);
 
-// 💾 Export ke PDF
+// Export ke PDF
 function exportPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -199,7 +228,7 @@ function exportPDF(){
   doc.save(filename);
 }
 
-// refresh otomatis setiap 5 menit
+// Jalankan awal
 fetchData();
 setInterval(fetchData, 300000);
 </script>
