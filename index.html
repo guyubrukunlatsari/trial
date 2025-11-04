@@ -1,310 +1,207 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DASHBOARD KEUANGAN RT 04 RW 01 LATSARI , TUBAN</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DASHBOARD RT 04 RW 01 LATSARI</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --green:#00ff88;
-  --muted:#aaa;
-  --bg:#0f0f0f;
-  --panel:#1a1a1a;
-  --accent:#00cc66;
+:root {
+  --green: #00ff88;
+  --dark: #001a0d;
 }
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: var(--bg);
-  color: #f1f1f1;
-  margin:0;
-  padding:12px;
-}
-h1 {
-  text-align:center;
-  color:var(--green);
-  margin-bottom:10px;
-  font-size:1.2rem;
+  margin: 0;
+  background: #000;
+  color: #fff;
+  text-align: center;
 }
 #menu {
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:10px;
-  flex-wrap:wrap;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  gap: 10px;
 }
 #menu button {
-  padding:6px 12px;
-  border:none;
-  border-radius:6px;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.15s;
-  background:var(--accent);
-  color:#000;
+  background: #111;
+  border: 2px solid var(--green);
+  color: var(--green);
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
 }
-#menu button.active { 
-  background: #00ff88;
+#menu button:hover {
+  background: var(--green);
+  color: #000;
+}
+#menu button.active {
+  background: var(--green);
   color: #000;
   font-weight: 700;
 }
-#menu button:hover { 
-  background: #00cc66;
-  color: #fff;
-}
-
-.filter-container {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:8px;
-  margin-bottom:10px;
-  align-items:center;
-}
-.filter-container label {
-  color:#ddd;
-  font-size:0.85rem;
-  display:flex;
-  gap:6px;
-  align-items:center;
-}
-.filter-container input[type="date"], .filter-container input[type="text"], .filter-container button {
-  padding:6px 8px;
-  border-radius:6px;
-  border:1px solid #333;
-  background:var(--panel);
-  color:#fff;
-  font-size:0.9rem;
-}
-.filter-container input[type="text"]{ min-width:200px; }
-.filter-container button { background:var(--accent); color:#000; font-weight:600; cursor:pointer; }
-.filter-container button:hover{ background:var(--green); }
-
-.table-wrapper {
-  overflow-x:auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom:10px;
-  border-radius:6px;
-  width: 100%;
+#search {
+  padding: 8px;
+  width: 220px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 table {
-  width:100%;
-  border-collapse:collapse;
-  table-layout:auto;
+  width: 95%;
+  margin: 15px auto;
+  border-collapse: collapse;
 }
 th, td {
-  padding:8px;
-  font-size:0.85rem;
-  border-bottom:1px solid #333;
-  text-align:center;
-  vertical-align:middle;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  border: 1px solid var(--green);
+  padding: 8px;
+  text-align: center;
 }
-th { background-color:var(--accent); color:#000; font-weight:700; }
-td.foto img { max-width:60px; max-height:50px; border-radius:4px; display:block; margin:auto; }
-tr:nth-child(even){background:#171717;}
-tr:hover{background:#222;}
-
-.highlight{background:#00ff44;color:#000;font-weight:700;border-radius:3px;padding:0 3px;}
-td.nominal-cell { color: var(--green) !important; font-weight:700; }
-
-th:nth-child(1), td:nth-child(1) { width:2%; min-width:40px; max-width:60px; }
-th:nth-child(2), td:nth-child(2),
-th:nth-child(3), td:nth-child(3) { width:8%; min-width:80px; max-width:100px; }
-th:nth-child(4), td:nth-child(4),
-th:nth-child(5), td:nth-child(5),
-th:nth-child(6), td:nth-child(6) { width:14%; min-width:140px; word-break: break-word; }
-th:nth-child(7), td:nth-child(7) { width:7%; min-width:80px; max-width:100px; }
-
-.pagination{display:flex; justify-content:center; flex-wrap:wrap; gap:6px; margin-top:8px;}
-.pagination button{padding:6px 8px; border-radius:6px; font-size:0.85rem; background:#222; color:#ddd; border:1px solid #333;}
-.pagination button.active{background:var(--green); color:#000; transform:scale(1.05);}
-.pagination button:disabled{background:#333;color:#777; cursor:not-allowed;}
-
-#update-time {text-align:center; color:var(--muted); font-size:0.78rem; margin-bottom:6px;}
-#total-container { text-align:center; margin-top:6px; font-weight:700; color:var(--green); }
-footer { text-align:center; font-size:11px; color:#777; margin-top:12px; }
-
-.loader { border: 3px solid #333; border-top: 3px solid var(--green); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin:auto; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-
-@media(max-width:600px){
-  .filter-container input[type="text"]{ min-width:120px; }
-  th, td { padding:6px 4px; font-size:0.75rem; }
+th {
+  background: var(--dark);
 }
-@media(max-width:400px){
-  h1 { font-size:1rem; }
-  #menu button { font-size:0.75rem; padding:3px 6px; }
+tfoot td {
+  font-weight: 700;
+  color: var(--green);
 }
-
-body.rekap-active table#main-table {
-  table-layout: fixed;
+#info {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #ccc;
 }
-body.rekap-active table#main-table th:nth-child(1),
-body.rekap-active table#main-table td:nth-child(1) {
-  width: 70%;
-  text-align: left;
+#clock {
+  font-weight: 600;
+  color: var(--green);
 }
-body.rekap-active table#main-table th:nth-child(2),
-body.rekap-active table#main-table td:nth-child(2) {
-  width: 30%;
-  text-align: right;
+button.export {
+  margin-top: 10px;
+  background: var(--green);
+  color: #000;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+button.export:hover {
+  opacity: 0.8;
 }
 </style>
 </head>
 <body>
-<h1>DASHBOARD KEUANGAN RT 04 RW 01 LATSARI , TUBAN</h1>
+<h2>DASHBOARD RT 04 RW 01 LATSARI</h2>
 
+<!-- Menu navigasi -->
 <div id="menu">
-  <button data-sheet="hariini" class="active">Hari Ini</button>
+  <button class="active" data-sheet="hariini">Hari Ini</button>
   <button data-sheet="harian">Jimpitan Harian</button>
+  <button data-sheet="bulanan">Warga Bulanan</button>
+  <button data-sheet="pengeluaran">Pengeluaran</button>
   <button data-sheet="rekap">Rekap Keuangan</button>
-  <button data-sheet="warga">Laporan Warga Bulanan</button>
-  <button data-sheet="pengeluaran">Laporan Pengeluaran</button>
 </div>
 
+<input type="text" id="search" placeholder="Cari data...">
+<table id="dataTable">
+  <thead></thead>
+  <tbody></tbody>
+  <tfoot></tfoot>
+</table>
+
+<button class="export" onclick="exportPDF()">Export ke PDF</button>
+<div id="info">Diperbarui otomatis: <span id="lastUpdate">-</span> | <span id="clock"></span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
 <script>
-const sheetsConfig = {
-  hariini: {
-    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=0&single=true&output=csv",
-    columns: ["NO","TANGGAL","NAMA","SETORAN (Rp)","PETUGAS","KETERANGAN","FOTO"]
-  },
-  harian: {
-    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=0&single=true&output=csv",
-    columns: ["NO","TANGGAL","NAMA","SETORAN (Rp)","PETUGAS","KETERANGAN","FOTO"]
-  },
-  rekap: {
-    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=123456789&single=true&output=csv",
-    columns: ["NO","KETERANGAN","JUMLAH"]
-  },
-  warga: {
-    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=987654321&single=true&output=csv",
-    columns: ["NO","NAMA","RT","BULAN","JUMLAH (Rp)","KETERANGAN"]
-  },
-  pengeluaran: {
-    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=1122334455&single=true&output=csv",
-    columns: ["NO","TANGGAL","KEPERLUAN","NOMINAL (Rp)","KETERANGAN","FOTO"]
-  }
+const SHEET_URLS = {
+  harian: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1iVvNflK4vYg0tKVCum9cbM2e_qyZt0SC4fq/pub?gid=0&single=true&output=csv",
+  bulanan: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoi3H4OvwDgoDwCtwngpA8ygNRyRpePtEkSt5pVVbDUgVwe1KcC2hb_H61gJoFP0/pub?gid=0&single=true&output=csv",
+  pengeluaran: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTDAXKhv_Br6Yf0uA1PV0U_TvD4FxErUUtZfWUR3y2D7dWzKfRVR1yI7KfUJ9s6Tg/pub?gid=0&single=true&output=csv",
+  rekap: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWRBBKQpQy4GbKhP_HcZLxgYUJf8DF0UQEtbFTj-lbZpNgHTcmQbR_FXUOlspHA/pub?gid=0&single=true&output=csv",
+  hariini: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1iVvNflK4vYg0tKVCum9cbM2e_qyZt0SC4fq/pub?gid=0&single=true&output=csv"
 };
 
-let currentSheet = "hariini";
-let allData = [];
-let filteredData = [];
-let currentPage = 1;
-let currentKeyword = "";
+let currentSheet="hariini", allData=[], filteredData=[], currentKeyword="";
 
-function formatRupiah(num){ return "Rp " + Number(num||0).toLocaleString("id-ID"); }
-
-function showLoading(){
-  document.querySelector("#dataTable tbody").innerHTML = `<tr><td colspan="10">⏳ Memuat data...</td></tr>`;
-}
-
-function fetchData(){
-  const activeBtn = document.querySelector("#menu button.active");
-  const originalText = activeBtn.textContent;
-  activeBtn.textContent = "⏳ " + originalText;
-  activeBtn.disabled = true;
-  showLoading();
-
-  const cfg = sheetsConfig[currentSheet];
-  fetch(cfg.url)
-  .then(r=>r.text())
-  .then(csv=>{
-    const rows = csv.trim().split("\n").map(r=>r.split(","));
-    const headers = rows[0].map(h=>h.trim().toUpperCase());
-    allData = rows.slice(1).map(r=>{
-      let o={};
-      headers.forEach((h,i)=>o[h]=r[i]||"");
-      return o;
-    });
-
-    // 🔹 Khusus menu “Hari Ini” → hanya ambil baris dengan NO terbesar
-    if(currentSheet==="hariini" && allData.length>0){
-      const maxNo = Math.max(...allData.map(d=>Number(d["NO"])||0));
-      allData = allData.filter(d=>Number(d["NO"])===maxNo);
-    }
-
-    renderTable();
-  })
-  .catch(()=>{
-    document.querySelector("#dataTable tbody").innerHTML = `<tr><td colspan="10">❌ Gagal memuat data.</td></tr>`;
-  })
-  .finally(()=>{
-    activeBtn.textContent = originalText;
-    activeBtn.disabled = false;
-  });
-}
-
-function renderTable(){
-  const cfg = sheetsConfig[currentSheet];
-  const tbody = document.querySelector("#dataTable tbody");
-  if(!cfg){ tbody.innerHTML="<tr><td colspan='10'>Sheet tidak ditemukan.</td></tr>"; return; }
-
-  filteredData = allData.filter(row=>{
-    const keyword = currentKeyword.toLowerCase();
-    return Object.values(row).some(v=>String(v).toLowerCase().includes(keyword));
+// 🔄 Ambil data dari CSV Google Sheets
+async function fetchData(){
+  const url = SHEET_URLS[currentSheet];
+  const res = await fetch(url);
+  const text = await res.text();
+  const rows = text.trim().split("\n").map(r=>r.split(","));
+  const headers = rows[0];
+  allData = rows.slice(1).map(r=>{
+    let obj={}; headers.forEach((h,i)=>obj[h.trim()]=r[i]?.trim()||""); 
+    return obj;
   });
 
-  const rowsPerPage = 10;
-  const start = (currentPage-1)*rowsPerPage;
-  const pageData = filteredData.slice(start,start+rowsPerPage);
+  // jika "Hari Ini" => ambil NO terbesar
+  if(currentSheet==="hariini" && allData.length>0){
+    const maxNo = Math.max(...allData.map(d=>Number(d["NO"])||0));
+    allData = allData.filter(d=>Number(d["NO"])===maxNo);
+  }
 
-  tbody.innerHTML = pageData.map(r=>{
-    return `<tr>${cfg.columns.map(c=>{
-      const val = r[c.toUpperCase()]||"";
-      if(c.toLowerCase().includes("foto") && val) return `<td><img src="${val}" width="50"></td>`;
-      return `<td>${val}</td>`;
-    }).join("")}</tr>`;
-  }).join("");
+  renderTable(allData);
+  document.getElementById("lastUpdate").textContent = new Date().toLocaleString("id-ID");
+}
 
-  document.getElementById("pageInfo").textContent = `Halaman ${currentPage} / ${Math.ceil(filteredData.length/rowsPerPage)||1}`;
-
-  // Total khusus menu rekap
-  if(currentSheet==="rekap"){
-    const sum = filteredData.reduce((a,b)=>{
-      const rawVal = b["JUMLAH"]||"0";
-      const num = Number(String(rawVal).replace(/[^0-9]/g,""));
-      return a+(isNaN(num)?0:num);
-    },0);
-    document.getElementById("total-container").textContent="Total: "+formatRupiah(sum);
-  }else{
-    document.getElementById("total-container").textContent="";
+// 🧾 Tampilkan tabel
+function renderTable(data){
+  filteredData = data.filter(row => Object.values(row).join(" ").toLowerCase().includes(currentKeyword.toLowerCase()));
+  const table = document.getElementById("dataTable");
+  const keys = Object.keys(data[0] || {});
+  table.querySelector("thead").innerHTML = `<tr>${keys.map(k=>`<th>${k}</th>`).join("")}</tr>`;
+  table.querySelector("tbody").innerHTML = filteredData.map(row=>`<tr>${keys.map(k=>`<td>${row[k]}</td>`).join("")}</tr>`).join("");
+  
+  // total rupiah jika ada kolom "NOMINAL (Rp)"
+  if(keys.includes("NOMINAL (Rp)")){
+    const total = filteredData.reduce((a,b)=>a+(Number(b["NOMINAL (Rp)"].replace(/[^0-9]/g,""))||0),0);
+    table.querySelector("tfoot").innerHTML = `<tr><td colspan="${keys.length}">TOTAL: Rp ${total.toLocaleString("id-ID")}</td></tr>`;
+  } else {
+    table.querySelector("tfoot").innerHTML = "";
   }
 }
 
-document.getElementById("menu").addEventListener("click",e=>{
-  if(e.target.tagName==="BUTTON"){
+// 🔍 Pencarian otomatis
+document.getElementById("search").addEventListener("input", e=>{
+  currentKeyword = e.target.value;
+  renderTable(allData);
+});
+
+// 📅 Ganti sheet
+document.querySelectorAll("#menu button").forEach(btn=>{
+  btn.onclick = ()=>{
     document.querySelectorAll("#menu button").forEach(b=>b.classList.remove("active"));
-    e.target.classList.add("active");
-    currentSheet=e.target.dataset.sheet;
-    currentPage=1;
+    btn.classList.add("active");
+    currentSheet = btn.dataset.sheet;
     fetchData();
-  }
+  };
 });
 
-document.getElementById("searchBox").addEventListener("input",e=>{
-  currentKeyword=e.target.value;
-  renderTable();
-});
+// ⏰ Jam realtime
+setInterval(()=>{
+  document.getElementById("clock").textContent = new Date().toLocaleTimeString("id-ID");
+},1000);
 
-document.getElementById("pdfBtn").addEventListener("click",()=>{
+// 💾 Export ke PDF
+function exportPDF(){
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: "landscape" });
-  const cfg = sheetsConfig[currentSheet];
+  const doc = new jsPDF();
   const title = document.querySelector("#menu button.active").textContent;
-  doc.setFontSize(14);
-  doc.text(title, 14, 15);
-  doc.autoTable({
-    startY: 20,
-    head: [cfg.columns],
-    body: filteredData.map(r => cfg.columns.map(c => String(r[c.toUpperCase()]||""))),
-    styles: { fontSize: 8 },
-  });
-  const nowStr = new Date().toLocaleDateString("id-ID").replace(/\//g,"-");
-  doc.save(`${title.replace(/\s/g,"_")}_${nowStr}.pdf`);
-});
+  doc.text(`Laporan ${title}`, 14, 10);
+  doc.autoTable({ html: "#dataTable", startY: 20 });
+  const filename = `${title.replace(/\s+/g,"_")}_${new Date().toLocaleDateString("id-ID")}.pdf`;
+  doc.save(filename);
+}
 
+// refresh otomatis setiap 5 menit
 fetchData();
-setInterval(fetchData,300000);
+setInterval(fetchData, 300000);
 </script>
+</body>
+</html>
