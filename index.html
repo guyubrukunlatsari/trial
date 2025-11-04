@@ -157,148 +157,121 @@ body.rekap-active table#main-table td:nth-child(2) {
 <h1>DASHBOARD KEUANGAN RT 04 RW 01 LATSARI , TUBAN</h1>
 
 <div id="menu">
-  <button class="active" data-sheet="harian">Jimpitan Harian</button>
-  <button data-sheet="hariini">Hari Ini</button>
-  <button data-sheet="bulanan">Warga Bulanan</button>
-  <button data-sheet="pengeluaran">Pengeluaran</button>
+  <button data-sheet="hariini" class="active">Hari Ini</button>
+  <button data-sheet="harian">Jimpitan Harian</button>
   <button data-sheet="rekap">Rekap Keuangan</button>
+  <button data-sheet="warga">Laporan Warga Bulanan</button>
+  <button data-sheet="pengeluaran">Laporan Pengeluaran</button>
 </div>
-
-<div id="update-time">Diperbarui otomatis: ⏳</div>
-
-<div class="filter-container">
-  <label>Dari: <input type="date" id="startDate"></label>
-  <label>Sampai: <input type="date" id="endDate"></label>
-  <input type="text" id="searchBox" placeholder="🔎 Cari semua kolom..." />
-  <button id="resetBtn">🔄 Reset</button>
-  <button id="pdfBtn">📄 Export PDF</button>
-</div>
-
-<div class="table-wrapper">
-  <table id="main-table" role="table" aria-label="Data keuangan">
-    <thead id="table-head"></thead>
-    <tbody id="table-body"><tr><td colspan="8"><div class="loader"></div></td></tr></tbody>
-  </table>
-</div>
-
-<div id="total-container"></div>
-<div class="pagination" id="pagination"></div>
-<footer>Data otomatis diperbarui dari Google Sheet</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
 const sheetsConfig = {
-  harian:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Jimpitan Harian", columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"], query:"SELECT A,B,C,E,F,G,H,I", rowsPerPage:10 },
-  hariini:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Jimpitan Harian", columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"], query:"SELECT A,B,C,E,F,G,H,I", rowsPerPage:10 },
-  bulanan:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Warga Bulanan", columns:["NO","TANGGAL","NAMA WARGA","PERIODE BAYAR","NOMINAL (Rp)","KETERANGAN","FOTO"], query:"SELECT A,B,C,D,E,F,G", rowsPerPage:10 },
-  pengeluaran:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Pengeluaran", columns:["NO","TANGGAL","KEPERLUAN","NOMINAL (Rp)","KETERANGAN","FOTO"], query:"SELECT A,B,C,D,E,F", rowsPerPage:10 },
-  rekap:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Rekap Keuangan RT", columns:["DESKRIPSI","JUMLAH"], query:"SELECT A,B", rowsPerPage:1000 }
+  hariini: {
+    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=0&single=true&output=csv",
+    columns: ["NO","TANGGAL","NAMA","SETORAN (Rp)","PETUGAS","KETERANGAN","FOTO"]
+  },
+  harian: {
+    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=0&single=true&output=csv",
+    columns: ["NO","TANGGAL","NAMA","SETORAN (Rp)","PETUGAS","KETERANGAN","FOTO"]
+  },
+  rekap: {
+    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=123456789&single=true&output=csv",
+    columns: ["NO","KETERANGAN","JUMLAH"]
+  },
+  warga: {
+    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=987654321&single=true&output=csv",
+    columns: ["NO","NAMA","RT","BULAN","JUMLAH (Rp)","KETERANGAN"]
+  },
+  pengeluaran: {
+    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFzjNwESJhj-eGvY4RH3dsV2hT7D4bvD-MohbrKWuVN1/pub?gid=1122334455&single=true&output=csv",
+    columns: ["NO","TANGGAL","KEPERLUAN","NOMINAL (Rp)","KETERANGAN","FOTO"]
+  }
 };
 
-let currentSheet="harian", allData=[], filteredData=[], currentPage=1, currentKeyword="";
+let currentSheet = "hariini";
+let allData = [];
+let filteredData = [];
+let currentPage = 1;
+let currentKeyword = "";
 
-function parseDate(val){ if(!val) return {text:"", raw:null}; if(typeof val==="string" && val.startsWith("Date(")){ const m=val.match(/Date\((\d+),(\d+),(\d+)/); if(m){ const d=new Date(Number(m[1]),Number(m[2]),Number(m[3])); return formatDateObj(d); } } if(/^\d{4}-\d{2}-\d{2}$/.test(val)){ return formatDateObj(new Date(val)); } if(/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(val)){ const [dd,mm,yy]=val.split(/[-/]/); return formatDateObj(new Date(`${yy}-${mm}-${dd}`)); } return formatDateObj(new Date(val)); }
-function formatDateObj(d){ if(!d||isNaN(d)) return {text:"", raw:null}; const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yy=d.getFullYear(); return {text:`${dd}-${mm}-${yy}`, raw:d}; }
-function formatRupiah(val){ if(val===null||val===undefined||val==="") return "-"; const num=Number(String(val).replace(/[^0-9]/g,"")); return isNaN(num)?val:"Rp. "+num.toLocaleString("id-ID")+",-"; }
+function formatRupiah(num){ return "Rp " + Number(num||0).toLocaleString("id-ID"); }
 
-function showLoading(){ const cols=sheetsConfig[currentSheet].columns.length||8; document.getElementById("table-body").innerHTML=`<tr><td colspan="${cols}"><div class="loader"></div></td></tr>`; }
-
-function fetchData(){
-  showLoading(); currentKeyword=""; document.getElementById("searchBox").value="";
-  const cfg=sheetsConfig[currentSheet];
-  const url=`https://docs.google.com/spreadsheets/d/${cfg.sheetId}/gviz/tq?sheet=${encodeURIComponent(cfg.sheetName)}&tq=${encodeURIComponent(cfg.query)}`;
-  fetch(url).then(r=>r.text()).then(rep=>{
-    try{
-      const json=JSON.parse(rep.match(/google\.visualization\.Query\.setResponse\((.*)\)/)[1]);
-      const rows=json.table.rows.map(r=>r.c.map(c=>c?v=c.v:""));
-      allData=rows.map(r=>{
-        const t=parseDate(r[1]); let obj={};
-        cfg.columns.forEach((col,idx)=> obj[col.toUpperCase()]=r[idx]||"");
-        if(obj["TANGGAL"]) obj["TANGGALOBJ"]=t.raw;
-        if(obj["TANGGAL"]) obj["TANGGAL"]=t.text||obj["TANGGAL"];
-        if(obj["JUMLAH"]) obj["JUMLAH"]=formatRupiah(obj["JUMLAH"]);
-        if(obj["HASIL (RP)"]) obj["HASIL (RP)"]=formatRupiah(obj["HASIL (RP)"]);
-        if(obj["NOMINAL (RP)"]) obj["NOMINAL (RP)"]=formatRupiah(obj["NOMINAL (RP)"]);
-        return obj;
-      });
-
-      // Jika menu "Hari Ini", tampilkan hanya baris dengan NO tertinggi
-      if(currentSheet==="hariini" && allData.length>0){
-        const maxNo = Math.max(...allData.map(d=>Number(d["NO"])||0));
-        allData = allData.filter(d=>Number(d["NO"])===maxNo);
-      }
-
-      allData.sort((a,b)=>{ const da=a["TANGGALOBJ"],db=b["TANGGALOBJ"]; if(!da&&!db) return 0; if(!da) return 1; if(!db) return -1; return db-da; });
-      filteredData=allData;
-      toggleDateInputs(currentSheet==="rekap" || currentSheet==="hariini");
-      renderTable();
-      const now=new Date();
-      document.getElementById("update-time").textContent="Diperbarui otomatis: "+now.toLocaleString("id-ID",{ weekday:"short", day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"});
-    }catch(e){
-      document.getElementById("table-body").innerHTML=`<tr><td colspan="${cfg.columns.length}">❌ Gagal memuat data</td></tr>`; console.error(e);
-    }
-  }).catch(err=>{
-    document.getElementById("table-body").innerHTML=`<tr><td colspan="${cfg.columns.length}">⚠️ Tidak dapat mengambil data</td></tr>`; console.error(err);
-  });
+function showLoading(){
+  document.querySelector("#dataTable tbody").innerHTML = `<tr><td colspan="10">⏳ Memuat data...</td></tr>`;
 }
 
-function toggleDateInputs(disable){ const s=document.getElementById("startDate"), e=document.getElementById("endDate"); if(disable){ s.value=""; e.value=""; s.disabled=true; e.disabled=true; s.style.opacity=0.6; e.style.opacity=0.6; } else{ s.disabled=false; e.disabled=false; s.style.opacity=1; e.style.opacity=1; } }
+function fetchData(){
+  const activeBtn = document.querySelector("#menu button.active");
+  const originalText = activeBtn.textContent;
+  activeBtn.textContent = "⏳ " + originalText;
+  activeBtn.disabled = true;
+  showLoading();
 
-function getFilteredData(){
-  const sDate=document.getElementById("startDate").value;
-  const eDate=document.getElementById("endDate").value;
-  const start=sDate?new Date(sDate+"T00:00:00"):null;
-  const end=eDate?new Date(eDate+"T23:59:59"):null;
-  const keyword=currentKeyword.trim().toLowerCase();
-  return allData.filter(row=>{
-    const tgl=row["TANGGALOBJ"] instanceof Date?row["TANGGALOBJ"]:null;
-    let matchDate=true;
-    if(start&&tgl) matchDate=tgl>=start;
-    if(end&&tgl) matchDate=matchDate&&tgl<=end;
-    const matchText=keyword?Object.values(row).some(v=>String(v).toLowerCase().includes(keyword)):true;
-    return matchDate&&matchText;
+  const cfg = sheetsConfig[currentSheet];
+  fetch(cfg.url)
+  .then(r=>r.text())
+  .then(csv=>{
+    const rows = csv.trim().split("\n").map(r=>r.split(","));
+    const headers = rows[0].map(h=>h.trim().toUpperCase());
+    allData = rows.slice(1).map(r=>{
+      let o={};
+      headers.forEach((h,i)=>o[h]=r[i]||"");
+      return o;
+    });
+
+    // 🔹 Khusus menu “Hari Ini” → hanya ambil baris dengan NO terbesar
+    if(currentSheet==="hariini" && allData.length>0){
+      const maxNo = Math.max(...allData.map(d=>Number(d["NO"])||0));
+      allData = allData.filter(d=>Number(d["NO"])===maxNo);
+    }
+
+    renderTable();
+  })
+  .catch(()=>{
+    document.querySelector("#dataTable tbody").innerHTML = `<tr><td colspan="10">❌ Gagal memuat data.</td></tr>`;
+  })
+  .finally(()=>{
+    activeBtn.textContent = originalText;
+    activeBtn.disabled = false;
   });
 }
 
 function renderTable(){
-  filteredData=getFilteredData();
-  const cfg=sheetsConfig[currentSheet];
-  const thead=document.getElementById("table-head");
-  const tbody=document.getElementById("table-body");
-  tbody.innerHTML=""; thead.innerHTML="";
-  const trh=document.createElement("tr");
-  cfg.columns.forEach(c=>{ const th=document.createElement("th"); th.textContent=c; trh.appendChild(th); });
-  thead.appendChild(trh);
+  const cfg = sheetsConfig[currentSheet];
+  const tbody = document.querySelector("#dataTable tbody");
+  if(!cfg){ tbody.innerHTML="<tr><td colspan='10'>Sheet tidak ditemukan.</td></tr>"; return; }
 
-  const view=filteredData;
-  if(view.length===0){ tbody.innerHTML=`<tr><td colspan="${cfg.columns.length}">Tidak ada data</td></tr>`; document.getElementById("pagination").innerHTML=""; document.getElementById("total-container").textContent=""; return; }
-
-  view.forEach(row=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=cfg.columns.map(col=>{
-      const key=col.toUpperCase();
-      let val=row[key]||"";
-      let cls="";
-      if(["HASIL (RP)","NOMINAL (RP)","JUMLAH"].includes(key)) cls="nominal-cell";
-      if(key==="FOTO"&&val) val=`<img src="${val}" alt="Foto">`; else val=highlightText(String(val),currentKeyword);
-      return `<td class="${cls}">${val}</td>`;
-    }).join("");
-    tbody.appendChild(tr);
+  filteredData = allData.filter(row=>{
+    const keyword = currentKeyword.toLowerCase();
+    return Object.values(row).some(v=>String(v).toLowerCase().includes(keyword));
   });
 
-  if(["harian","bulanan","pengeluaran","hariini"].includes(currentSheet)){
-    const sum=filteredData.reduce((acc,row)=>{ const rawVal=(row["HASIL (RP)"]||row["NOMINAL (RP)"]||row["JUMLAH"])||""; const num=Number(String(rawVal).replace(/[^0-9]/g,"")); return acc+(isNaN(num)?0:num); },0);
+  const rowsPerPage = 10;
+  const start = (currentPage-1)*rowsPerPage;
+  const pageData = filteredData.slice(start,start+rowsPerPage);
+
+  tbody.innerHTML = pageData.map(r=>{
+    return `<tr>${cfg.columns.map(c=>{
+      const val = r[c.toUpperCase()]||"";
+      if(c.toLowerCase().includes("foto") && val) return `<td><img src="${val}" width="50"></td>`;
+      return `<td>${val}</td>`;
+    }).join("")}</tr>`;
+  }).join("");
+
+  document.getElementById("pageInfo").textContent = `Halaman ${currentPage} / ${Math.ceil(filteredData.length/rowsPerPage)||1}`;
+
+  // Total khusus menu rekap
+  if(currentSheet==="rekap"){
+    const sum = filteredData.reduce((a,b)=>{
+      const rawVal = b["JUMLAH"]||"0";
+      const num = Number(String(rawVal).replace(/[^0-9]/g,""));
+      return a+(isNaN(num)?0:num);
+    },0);
     document.getElementById("total-container").textContent="Total: "+formatRupiah(sum);
   }else{
     document.getElementById("total-container").textContent="";
   }
-
-  document.body.classList.toggle("rekap-active", currentSheet==="rekap");
 }
-
-function highlightText(text,keyword){ if(!keyword) return text; const re=new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})`,"gi"); return text.replace(re,'<span class="highlight">$1</span>'); }
 
 document.getElementById("menu").addEventListener("click",e=>{
   if(e.target.tagName==="BUTTON"){
@@ -309,10 +282,11 @@ document.getElementById("menu").addEventListener("click",e=>{
     fetchData();
   }
 });
-document.getElementById("searchBox").addEventListener("input",e=>{ currentKeyword=e.target.value; renderTable(); });
-document.getElementById("startDate").addEventListener("change",renderTable);
-document.getElementById("endDate").addEventListener("change",renderTable);
-document.getElementById("resetBtn").addEventListener("click",()=>{ document.getElementById("startDate").value=""; document.getElementById("endDate").value=""; document.getElementById("searchBox").value=""; currentKeyword=""; renderTable(); });
+
+document.getElementById("searchBox").addEventListener("input",e=>{
+  currentKeyword=e.target.value;
+  renderTable();
+});
 
 document.getElementById("pdfBtn").addEventListener("click",()=>{
   const { jsPDF } = window.jspdf;
@@ -334,5 +308,3 @@ document.getElementById("pdfBtn").addEventListener("click",()=>{
 fetchData();
 setInterval(fetchData,300000);
 </script>
-</body>
-</html>
