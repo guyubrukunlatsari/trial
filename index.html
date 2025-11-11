@@ -127,194 +127,223 @@ th{
 </div>
 
 <script>
-const SHEET_URL_BASE =
-  "https://docs.google.com/spreadsheets/d/1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw/gviz/tq?sheet=";
 
-// CONFIG
-const sheetsConfig = {
+// ==================== CONFIG ===========================
+const SHEET_ID = "1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw";
 
-  // <<< tambahan HARI INI
-  hariini:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Laporan Jimpitan Harian",
-    columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
-    query:"SELECT A,B,C,E,F,G,H,I",
-    rowsPerPage:1
-  },
+const SHEETS = {
+    hariini: {
+        sheetName: "Laporan Jimpitan Harian",
+        query: "SELECT A,B,C,E,F,G,H,I",
+        columns: ["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
+        rowsPerPage: 1
+    },
 
-  harian:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Laporan Jimpitan Harian",
-    columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
-    query:"SELECT A,B,C,E,F,G,H,I",
-    rowsPerPage:10
-  },
+    harian: {
+        sheetName: "Laporan Jimpitan Harian",
+        query: "SELECT A,B,C,E,F,G,H,I",
+        columns: ["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
+        rowsPerPage: 10
+    },
 
-  bulanan:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Warga Bulanan",
-    columns:["NO","NAMA","RT","BULAN","TANGGAL BAYAR","TOTAL","PETUGAS","STATUS"],
-    query:"SELECT A,B,C,D,E,F,G,H",
-    rowsPerPage:10
-  },
+    bulanan: {
+        sheetName: "Laporan Warga Bulanan",
+        query: "SELECT A,B,C,D,E,F,G",
+        columns: ["NO","TANGGAL","NAMA WARGA","PERIODE BAYAR","NOMINAL (Rp)","KETERANGAN","FOTO"],
+        rowsPerPage: 10
+    },
 
-  pengeluaran:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Pengeluaran",
-    columns:["NO","TANGGAL","ITEM","NOMINAL","KETERANGAN"],
-    query:"SELECT A,B,C,D,E",
-    rowsPerPage:10
-  },
+    pengeluaran: {
+        sheetName: "Laporan Pengeluaran",
+        query: "SELECT A,B,C,D,E,F",
+        columns: ["NO","TANGGAL","KEPERLUAN","NOMINAL (Rp)","KETERANGAN","FOTO"],
+        rowsPerPage: 10
+    },
 
-  rekap:{
-    sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-    sheetName:"Rekap",
-    columns:["BULAN","MASUK","KELUAR","TOTAL"],
-    query:"SELECT A,B,C,D",
-    rowsPerPage:12
-  }
+    rekap: {
+        sheetName: "Rekap Keuangan RT",
+        query: "SELECT A,B",
+        columns: ["DESKRIPSI","JUMLAH"],
+        rowsPerPage: 100
+    }
 };
 
-let currentSheet="harian";
-let allData=[];
-let filteredData=[];
-let currentPage=1;
+// ==================== VARIABEL ===========================
+let currentSheet = "harian";
+let allData = [];
+let filteredData = [];
+let currentPage = 1;
+let keyword = "";
 
-function fetchData(){
-  const cfg=sheetsConfig[currentSheet];
-  const queryUrl=`https://docs.google.com/spreadsheets/d/${cfg.sheetId}/gviz/tq?tq=${encodeURIComponent(cfg.query)}&sheet=${cfg.sheetName}`;
+// ==================== HELPER ===========================
+function rupiah(v){
+    if(!v) return "-";
+    const n = Number(String(v).replace(/\D/g,""));
+    if(isNaN(n)) return v;
+    return "Rp. " + n.toLocaleString("id-ID") + ",-";
+}
 
-  fetch(queryUrl)
-    .then(res => res.text())
-    .then(text => {
-      const json=JSON.parse(text.substr(47).slice(0,-2));
-      const rows=json.table.rows;
-      allData=rows.map(r=>{
-        const obj={};
-        cfg.columns.forEach((col,i)=>{
-          obj[col]=r.c[i]?r.c[i].v:"";
+function parseDate(val){
+    if(!val) return "";
+    if(val.startsWith("Date(")){
+        const p = val.match(/Date\((\d+),(\d+),(\d+)\)/);
+        const d = new Date(p[1],p[2],p[3]);
+        return format(d);
+    }
+    const d = new Date(val);
+    return isNaN(d) ? val : format(d);
+}
+
+function format(d){
+    const dd = String(d.getDate()).padStart(2,"0");
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const yy = d.getFullYear();
+    return `${dd}-${mm}-${yy}`;
+}
+
+// ==================== FETCH DATA ===========================
+function loadData(){
+    const cfg = SHEETS[currentSheet];
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(cfg.sheetName)}&tq=${encodeURIComponent(cfg.query)}`;
+    
+    showLoading();
+
+    fetch(url)
+    .then(r => r.text())
+    .then(txt => {
+        const json = JSON.parse(txt.match(/setResponse\((.*)\)/)[1]);
+        
+        allData = json.table.rows.map(r => {
+            const cells = r.c || [];
+            const obj = {};
+            cfg.columns.forEach((c, i)=>{
+                obj[c] = cells[i] ? (cells[i].v ?? "") : "";
+            });
+
+            if(obj["TANGGAL"]) obj["TANGGAL"] = parseDate(obj["TANGGAL"]);
+            if(obj["HASIL (Rp)"]) obj["HASIL (Rp)"]=rupiah(obj["HASIL (Rp)"]);
+            if(obj["NOMINAL (Rp)"]) obj["NOMINAL (Rp)"]=rupiah(obj["NOMINAL (Rp)"]);
+            if(obj["JUMLAH"]) obj["JUMLAH"]=rupiah(obj["JUMLAH"]);
+            return obj;
         });
 
-        if(obj["TANGGAL"]){
-          obj["TANGGALOBJ"]=new Date(obj["TANGGAL"]);
+        // Urutkan
+        if(currentSheet === "hariini" || currentSheet === "harian"){
+            allData.sort((a,b)=>{
+                return new Date(b["TANGGAL"]) - new Date(a["TANGGAL"]);
+            });
+
+            if(currentSheet === "hariini"){
+                allData = allData.slice(0,1);
+            }
         }
-        return obj;
-      });
+        else{
+            allData.sort((a,b)=>{
+                const na = Number(a.NO)||0;
+                const nb = Number(b.NO)||0;
+                return nb - na;
+            });
+        }
 
-      // SORTING
-      if(currentSheet==="harian" || currentSheet==="hariini"){
-          allData.sort((a,b)=>{
-              const da=a["TANGGALOBJ"], db=b["TANGGALOBJ"];
-              if(!da && !db) return 0;
-              if(!da) return 1;
-              if(!db) return -1;
-              return db-da;
-          });
-
-          // <<< tambahan logika HARI INI
-          if(currentSheet==="hariini"){
-              allData = allData.slice(0,1);
-          }
-
-      } else {
-          // untuk data bulanan & pengeluaran → urutkan berdasarkan NO descending
-          if(allData[0] && allData[0]["NO"] !== undefined){
-            allData.sort((a,b)=>parseInt(b.NO)-parseInt(a.NO));
-          }
-      }
-
-      filteredData=[...allData];
-      currentPage=1;
-      renderTable();
-      renderPagination();
-
-      toggleDateInputs(currentSheet==="rekap" || currentSheet==="hariini");
+        filteredData = allData;
+        currentPage = 1;
+        renderTable();
+        renderPagination();
     });
 }
 
-function toggleDateInputs(disabled){
-  document.getElementById("startDate").disabled=disabled;
-  document.getElementById("endDate").disabled=disabled;
-}
-
+// ==================== RENDER TABLE ===========================
 function renderTable(){
-  const cfg=sheetsConfig[currentSheet];
-  const start=(currentPage-1)*cfg.rowsPerPage;
-  const end=start+cfg.rowsPerPage;
-  const pageData=filteredData.slice(start,end);
+    const cfg = SHEETS[currentSheet];
+    const head = document.getElementById("table-head");
+    const body = document.getElementById("table-body");
 
-  let html="<tr>";
-  cfg.columns.forEach(col=>{
-    html+=`<th>${col}</th>`;
-  });
-  html+="</tr>";
+    head.innerHTML = "";
+    body.innerHTML = "";
 
-  pageData.forEach(row=>{
-    html+="<tr>";
-    cfg.columns.forEach(col=>{
-      html+=`<td>${row[col]??""}</td>`;
+    // header
+    let h = "<tr>";
+    cfg.columns.forEach(c => h += `<th>${c}</th>`);
+    h += "</tr>";
+    head.innerHTML = h;
+
+    // slice
+    const start = (currentPage-1)*cfg.rowsPerPage;
+    const end = start + cfg.rowsPerPage;
+    const view = filteredData.slice(start,end);
+
+    if(view.length === 0){
+        body.innerHTML = `<tr><td colspan="${cfg.columns.length}">Tidak ada data</td></tr>`;
+        return;
+    }
+
+    view.forEach(row=>{
+        let tr = "<tr>";
+        cfg.columns.forEach(c=>{
+            let val = row[c];
+            if(c==="FOTO" && val) val = `<img src="${val}" alt="foto">`;
+            tr += `<td>${val}</td>`;
+        });
+        tr += "</tr>";
+        body.innerHTML += tr;
     });
-    html+="</tr>";
-  });
-
-  document.getElementById("dataTable").innerHTML=html;
 }
 
+// ==================== PAGINATION ===========================
 function renderPagination(){
-  const cfg=sheetsConfig[currentSheet];
-  const totalPages=Math.ceil(filteredData.length/cfg.rowsPerPage);
-  let html="";
+    const cfg = SHEETS[currentSheet];
+    const div = document.getElementById("pagination");
+    div.innerHTML = "";
 
-  for(let i=1;i<=totalPages;i++){
-    html+=`<button class="${i===currentPage?"active":""}" onclick="goPage(${i})">${i}</button>`;
-  }
+    const pages = Math.ceil(filteredData.length / cfg.rowsPerPage);
+    if(pages <=1 ) return;
 
-  document.getElementById("pagination").innerHTML=html;
+    const prev=document.createElement("button");
+    prev.textContent="⬅️";
+    prev.disabled=currentPage===1;
+    prev.onclick=()=>{currentPage--;renderTable();renderPagination();};
+    div.appendChild(prev);
+
+    for(let i=1;i<=pages;i++){
+        const b=document.createElement("button");
+        b.textContent=i;
+        if(i===currentPage) b.classList.add("active");
+        b.onclick=()=>{currentPage=i;renderTable();renderPagination();};
+        div.appendChild(b);
+    }
+
+    const next=document.createElement("button");
+    next.textContent="➡️";
+    next.disabled=currentPage===pages;
+    next.onclick=()=>{currentPage++;renderTable();renderPagination();};
+    div.appendChild(next);
 }
 
-function goPage(p){
-  currentPage=p;
-  renderTable();
-  renderPagination();
-}
-
-function applyDateFilter(){
-  if(currentSheet==="hariini" || currentSheet==="rekap") return;
-
-  const s=document.getElementById("startDate").value;
-  const e=document.getElementById("endDate").value;
-
-  if(!s && !e){
-    filteredData=[...allData];
-  } else {
-    const sd=new Date(s);
-    const ed=new Date(e);
-    filteredData=allData.filter(r=>{
-      const d=r["TANGGALOBJ"];
-      if(!d) return false;
-      if(s && d<sd) return false;
-      if(e && d>ed) return false;
-      return true;
-    });
-  }
-
-  currentPage=1;
-  renderTable();
-  renderPagination();
+// ==================== UI ===========================
+function showLoading(){
+    const head = document.getElementById("table-head").innerHTML="";
+    document.getElementById("table-body").innerHTML=
+    `<tr><td colspan="99" style="text-align:center"><div class="loader"></div></td></tr>`;
 }
 
 document.querySelectorAll("#menu button").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll("#menu button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    currentSheet=btn.dataset.sheet;
-    document.getElementById("title").textContent=btn.textContent;
-    fetchData();
-  });
+    btn.addEventListener("click", ()=>{
+        document.querySelectorAll("#menu button").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        currentSheet = btn.dataset.sheet;
+        currentPage=1;
+        loadData();
+    });
 });
 
-fetchData();
+// ==================== INIT ===========================
+document.addEventListener("DOMContentLoaded", ()=>{
+    loadData();
+    setInterval(loadData,60000);
+});
+
 </script>
+
 
 </body>
 </html>
