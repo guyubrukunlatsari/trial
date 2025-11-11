@@ -131,16 +131,45 @@ th{
 <script>
 // ==== CONFIG & UTILS ====
 const sheetsConfig = {
-  hariini:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Jimpitan Harian", columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"], query:"SELECT A,B,C,E,F,G,H,I", rowsPerPage:1 },
+hariini:{ 
+  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
+  sheetName:"Jimpitan Harian",
+  columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
+  query:"SELECT A,B,C,E,F,G,H,I",
+  rowsPerPage:1
+},
 
-  harian:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Jimpitan Harian", columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"], query:"SELECT A,B,C,E,F,G,H,I", rowsPerPage:10 },
+harian:{
+  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
+  sheetName:"Jimpitan Harian",
+  columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
+  query:"SELECT A,B,C,E,F,G,H,I",
+  rowsPerPage:10
+},
 
-  bulanan:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Warga Bulanan", columns:["NO","TANGGAL","NAMA WARGA","PERIODE BAYAR","NOMINAL (Rp)","KETERANGAN","FOTO"], query:"SELECT A,B,C,D,E,F,G", rowsPerPage:10 },
+bulanan:{
+  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
+  sheetName:"Warga Bulanan",
+  columns:["NO","NAMA","RT","BULAN","TANGGAL BAYAR","TOTAL","PETUGAS","STATUS"],
+  query:"SELECT A,B,C,D,E,F,G,H",
+  rowsPerPage:10
+},
 
-  pengeluaran:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Laporan Pengeluaran", columns:["NO","TANGGAL","KEPERLUAN","NOMINAL (Rp)","KETERANGAN","FOTO"], query:"SELECT A,B,C,D,E,F", rowsPerPage:10 },
+pengeluaran:{
+  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
+  sheetName:"Pengeluaran",
+  columns:["NO","TANGGAL","ITEM","NOMINAL","KETERANGAN"],
+  query:"SELECT A,B,C,D,E",
+  rowsPerPage:10
+},
 
-  rekap:{ sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw", sheetName:"Rekap Keuangan RT", columns:["DESKRIPSI","JUMLAH"], query:"SELECT A,B", rowsPerPage:1000 }
-};
+rekap:{
+  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
+  sheetName:"Rekap",
+  columns:["BULAN","MASUK","KELUAR","TOTAL"],
+  query:"SELECT A,B,C,D",
+  rowsPerPage:12
+}
 
 let currentSheet="harian", allData=[], filteredData=[], currentPage=1, currentKeyword="";
 
