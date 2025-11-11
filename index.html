@@ -4,303 +4,204 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DASHBOARD KEUANGAN RT 04 RW 01 LATSARI , TUBAN</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --green:#00ff88;
-  --dark:#222;
-  --bg:#111;
-}
+    body {
+        margin: 0;
+        font-family: Poppins, sans-serif;
+        background: #111;
+        color: #fff;
+    }
 
-body{
-  margin:0;
-  font-family:Poppins, sans-serif;
-  background:var(--bg);
-  color:#fff;
-}
+    #menu {
+        display: flex;
+        gap: 8px;
+        padding: 10px;
+        background: #222;
+        position: sticky;
+        top: 0;
+        z-index: 99;
+    }
 
-#menu{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  padding:12px;
-  background:#000;
-}
+    #menu button {
+        padding: 10px 20px;
+        border: none;
+        background: #333;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 6px;
+        font-weight: 600;
+    }
 
-#menu button{
-  padding:8px 12px;
-  border:1px solid var(--green);
-  background:#000;
-  color:var(--green);
-  cursor:pointer;
-  border-radius:6px;
-}
+    #menu button.active {
+        background: #00ff88;
+        color: #000;
+    }
 
-#menu button.active{
-  background:var(--green);
-  color:#000;
-  font-weight:700;
-}
-
-#menu button:hover{
-  background:#00cc66;
-}
-
-#content{
-  padding:10px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:12px;
-}
-
-th,td{
-  padding:8px;
-  border:1px solid #444;
-  text-align:left;
-  font-size:14px;
-}
-
-th{
-  background:#333;
-}
-
-#pagination{
-  margin-top:10px;
-  display:flex;
-  gap:8px;
-}
-
-#pagination button{
-  padding:6px 12px;
-  color:#fff;
-  background:#444;
-  border:1px solid #666;
-  cursor:pointer;
-}
-
-#pagination button.active{
-  background:var(--green);
-  color:#000;
-}
-
-#date-filter{
-  margin-top:10px;
-}
-
-#date-filter input{
-  padding:5px;
-  background:#222;
-  color:#fff;
-  border:1px solid #666;
-  border-radius:4px;
-}
+    .page {
+        padding: 20px;
+        display: none;
+    }
 </style>
 </head>
-
 <body>
 
 <!-- MENU -->
 <div id="menu">
-  <button data-sheet="hariini">Hari Ini</button> <!-- <<< tambahan HARI INI -->
-  <button class="active" data-sheet="harian">Jimpitan Harian</button>
-  <button data-sheet="bulanan">Warga Bulanan</button>
-  <button data-sheet="pengeluaran">Pengeluaran</button>
-  <button data-sheet="rekap">Rekap Keuangan</button>
+    <button id="btn-jimpitan-harian" onclick="showPage('jimpitan-harian')">Jimpitan Harian</button>
 </div>
 
-<div id="content">
-  <h2 id="title">Jimpitan Harian</h2>
+<!-- AREA KONTEN -->
+<div id="content-area">
 
-  <div id="date-filter">
-    <label>Dari tanggal: <input type="date" id="startDate"></label>
-    <label>Sampai: <input type="date" id="endDate"></label>
-    <button onclick="applyDateFilter()">Filter</button>
-  </div>
+    <!-- HALAMAN ASLI ANDA -->
+    <div id="jimpitan-harian" class="page">
+        <h2>Jimpitan Harian</h2>
 
-  <table id="dataTable"></table>
+        <table border="1" cellpadding="6" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Nomor</th>
+                    <th>Nama</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-data-jimpitan">
+                <!-- diisi JS -->
+            </tbody>
+        </table>
+    </div>
 
-  <div id="pagination"></div>
 </div>
 
+
+<!-- ================================
+         SCRIPT JAVASCRIPT 
+================================= -->
 <script>
 
-<script>
-// ==== CONFIG & UTILS ====
-const sheetsConfig = {
-hariini:{ 
-  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-  sheetName:"Jimpitan Harian",
-  columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
-  query:"SELECT A,B,C,E,F,G,H,I",
-  rowsPerPage:1
-},
+// ======================
+// DATA CONTOH (ganti dengan data sheet asli Anda)
+// ======================
+const dataJimpitanHarian = [
+    { nomor: 1, nama: "Budi", jumlah: 2000, tanggal: "2025-11-10" },
+    { nomor: 2, nama: "Samsul", jumlah: 3000, tanggal: "2025-11-11" },
+    { nomor: 3, nama: "Roni", jumlah: 2000, tanggal: "2025-11-12" }
+];
 
-harian:{
-  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-  sheetName:"Jimpitan Harian",
-  columns:["NO","TANGGAL","HARI JAGA","HADIR","IZIN","ALPHA","HASIL (Rp)","KETERANGAN"],
-  query:"SELECT A,B,C,E,F,G,H,I",
-  rowsPerPage:10
-},
+// ======================
+// GENERATE TABLE JIMPITAN 
+// ======================
+function tampilkanJimpitan() {
+    const tbody = document.getElementById("tabel-data-jimpitan");
+    tbody.innerHTML = "";
 
-bulanan:{
-  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-  sheetName:"Warga Bulanan",
-  columns:["NO","NAMA","RT","BULAN","TANGGAL BAYAR","TOTAL","PETUGAS","STATUS"],
-  query:"SELECT A,B,C,D,E,F,G,H",
-  rowsPerPage:10
-},
-
-pengeluaran:{
-  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-  sheetName:"Pengeluaran",
-  columns:["NO","TANGGAL","ITEM","NOMINAL","KETERANGAN"],
-  query:"SELECT A,B,C,D,E",
-  rowsPerPage:10
-},
-
-rekap:{
-  sheetId:"1g1fp70L86yFkZt6OcOQjdKK9kgtHmPb2TqLou7a-4Pw",
-  sheetName:"Rekap",
-  columns:["BULAN","MASUK","KELUAR","TOTAL"],
-  query:"SELECT A,B,C,D",
-  rowsPerPage:12
+    dataJimpitanHarian.forEach(r => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${r.nomor}</td>
+                <td>${r.nama}</td>
+                <td>${r.jumlah}</td>
+                <td>${r.tanggal}</td>
+            </tr>
+        `;
+    });
 }
 
-let currentSheet="harian", allData=[], filteredData=[], currentPage=1, currentKeyword="";
 
-// parsing tanggal & format rupiah
-function parseDate(val){ if(!val) return {text:"", raw:null}; if(typeof val==="string" && val.startsWith("Date(")){ const m=val.match(/Date\((\d+),(\d+),(\d+)/); if(m){ const d=new Date(Number(m[1]),Number(m[2]),Number(m[3])); return formatDateObj(d); } } if(/^\d{4}-\d{2}-\d{2}$/.test(val)){ return formatDateObj(new Date(val)); } if(/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(val)){ const [dd,mm,yy]=val.split(/[-/]/); return formatDateObj(new Date(`${yy}-${mm}-${dd}`)); } return formatDateObj(new Date(val)); }
-function formatDateObj(d){ if(!d||isNaN(d)) return {text:"", raw:null}; const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yy=d.getFullYear(); return {text:`${dd}-${mm}-${yy}`, raw:d}; }
-function formatRupiah(val){ if(val===null||val===undefined||val==="") return "-"; const num=Number(String(val).replace(/[^0-9]/g,"")); return isNaN(num)?val:"Rp. "+num.toLocaleString("id-ID")+",-"; }
+// ======================
+// MENU DISPLAY
+// ======================
+function showPage(page) {
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+    document.getElementById(page).style.display = "block";
 
-// ==== FETCH DATA ====
-function showLoading(){ const cols=sheetsConfig[currentSheet].columns.length; document.getElementById("table-body").innerHTML=`<tr><td colspan="${cols}"><div class="loader"></div></td></tr>`; }
-function fetchData(){
-  showLoading(); currentKeyword=""; document.getElementById("searchBox").value="";
-  const cfg=sheetsConfig[currentSheet];
-  const url=`https://docs.google.com/spreadsheets/d/${cfg.sheetId}/gviz/tq?sheet=${encodeURIComponent(cfg.sheetName)}&tq=${encodeURIComponent(cfg.query)}`;
-  fetch(url).then(r=>r.text()).then(rep=>{
-    try{
-      const json=JSON.parse(rep.match(/google\.visualization\.Query\.setResponse\((.*)\)/)[1]);
-      const rows=json.table.rows.map(r=>r.c.map(c=>c?v=c.v:""));
-      allData=rows.map(r=>{
-        const t=parseDate(r[1]); let obj={};
-        cfg.columns.forEach((col,idx)=> obj[col.toUpperCase()]=r[idx]||"");
-        if(obj["TANGGAL"]) obj["TANGGALOBJ"]=t.raw;
-        if(obj["TANGGAL"]) obj["TANGGAL"]=t.text||obj["TANGGAL"];
-        if(obj["JUMLAH"]) obj["JUMLAH"]=formatRupiah(obj["JUMLAH"]);
-        if(obj["HASIL (RP)"]) obj["HASIL (RP)"]=formatRupiah(obj["HASIL (RP)"]);
-        if(obj["NOMINAL (RP)"]) obj["NOMINAL (RP)"]=formatRupiah(obj["NOMINAL (RP)"]);
-        return obj;
-      });
+    // ganti tombol aktif
+    document.querySelectorAll("#menu button").forEach(btn => btn.classList.remove("active"));
+    const aktif = document.getElementById("btn-" + page);
+    if (aktif) aktif.classList.add("active");
+}
 
-      // === Sorting khusus ===
-      if(currentSheet === "harian" || currentSheet === "hariini"){
-          allData.sort((a,b)=>{
-              const da=a["TANGGALOBJ"], db=b["TANGGALOBJ"];
-              if(!da && !db) return 0;
-              if(!da) return 1;
-              if(!db) return -1;
-              return db - da;  // terbaru di atas
-          });
-      }
-      else {
-          allData.sort((a,b)=>{
-              const na = Number(a["NO"]);
-              const nb = Number(b["NO"]);
-              if(isNaN(na) || isNaN(nb)) return 0;
-              return nb - na; // NO terbesar di atas
-          });
-      }
 
-      // khusus HARI INI → hanya ambil baris teratas
-      if(currentSheet==="hariini"){
-          allData = allData.length ? [ allData[0] ] : [];
-      }
+// ======================
+// MEMBUAT HALAMAN HARI INI
+// ======================
+function buatHalamanHariIni() {
+    const area = document.getElementById("content-area");
 
-      filteredData=allData;
-      toggleDateInputs(currentSheet==="rekap" || currentSheet==="hariini");
-      renderTable();
-    }catch(e){
-      document.getElementById("table-body").innerHTML=`<tr><td colspan="8">❌ Gagal memuat data</td></tr>`;
+    const div = document.createElement("div");
+    div.id = "hari-ini";
+    div.className = "page";
+    div.style.display = "none";
+
+    div.innerHTML = `
+        <h2>Hari Ini (Data Terakhir)</h2>
+        <div id="hari-ini-output"></div>
+    `;
+
+    area.insertBefore(div, area.firstChild.nextSibling);
+}
+
+
+// ======================
+// ISI HALAMAN "HARI INI"
+// ======================
+function tampilHariIni() {
+    const target = document.getElementById("hari-ini-output");
+
+    if (dataJimpitanHarian.length === 0) {
+        target.innerHTML = "<p>Tidak ada data</p>";
+        return;
     }
-  });
+
+    const last = dataJimpitanHarian.reduce((a, b) => (b.nomor > a.nomor ? b : a));
+
+    target.innerHTML = `
+        <table border="1" cellpadding="8" cellspacing="0" style="width:100%;">
+            <tr><th>Nomor</th><td>${last.nomor}</td></tr>
+            <tr><th>Nama</th><td>${last.nama}</td></tr>
+            <tr><th>Jumlah</th><td>${last.jumlah}</td></tr>
+            <tr><th>Tanggal</th><td>${last.tanggal}</td></tr>
+        </table>
+    `;
 }
 
-function toggleDateInputs(disable){
-  const s=document.getElementById("startDate"), e=document.getElementById("endDate");
-  if(disable){s.value="";e.value="";s.disabled=true;e.disabled=true;s.style.opacity=0.6;e.style.opacity=0.6;}
-  else{s.disabled=false;e.disabled=false;s.style.opacity=1;e.style.opacity=1;}
+
+// ============================
+// MEMBUAT TOMBOL HARI INI
+// ============================
+function buatTombolHariIni() {
+    const menu = document.getElementById("menu");
+
+    const btn = document.createElement("button");
+    btn.id = "btn-hari-ini";
+    btn.innerText = "Hari Ini";
+
+    btn.onclick = function() {
+        tampilHariIni();
+        showPage("hari-ini");
+    };
+
+    // letakkan sebelum tombol jimpitan harian
+    const jh = document.getElementById("btn-jimpitan-harian");
+    menu.insertBefore(btn, jh);
 }
 
-function getFilteredData(){
-  if(currentSheet==="hariini") return allData;
-  const sDate=document.getElementById("startDate").value;
-  const eDate=document.getElementById("endDate").value;
-  const start=sDate?new Date(sDate+"T00:00:00"):null;
-  const end=eDate?new Date(eDate+"T23:59:59"):null;
-  const keyword=currentKeyword.trim().toLowerCase();
 
-  return allData.filter(row=>{
-    const tgl=row["TANGGALOBJ"] instanceof Date?row["TANGGALOBJ"]:null;
-    let matchDate=true;
-    if(start&&tgl) matchDate=tgl>=start;
-    if(end&&tgl) matchDate=matchDate&&tgl<=end;
-    const matchText=keyword?Object.values(row).some(v=>String(v).toLowerCase().includes(keyword)):true;
-    return matchDate&&matchText;
-  });
-}
+// ======================
+// SAAT PAGE LOAD
+// ======================
+window.onload = function() {
+    tampilkanJimpitan();
+    buatTombolHariIni();
+    buatHalamanHariIni();
 
-function renderTable(){
-  filteredData=getFilteredData();
-  const cfg=sheetsConfig[currentSheet];
-  const thead=document.getElementById("table-head");
-  const tbody=document.getElementById("table-body");
-  tbody.innerHTML=""; thead.innerHTML="";
+    // default tampilkan jimpitan
+    showPage("jimpitan-harian");
+};
 
-  const trh=document.createElement("tr");
-  cfg.columns.forEach(c=>{ let th=document.createElement("th"); th.textContent=c; trh.appendChild(th); });
-  thead.appendChild(trh);
-
-  if(filteredData.length===0){
-    tbody.innerHTML=`<tr><td colspan="${cfg.columns.length}">Tidak ada data</td></tr>`;
-    return;
-  }
-
-  filteredData.forEach(row=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=cfg.columns.map(col=>{
-      const key=col.toUpperCase();
-      let val=row[key]||"";
-      if(["HASIL (RP)","NOMINAL (RP)","JUMLAH"].includes(key)) val=`<span class="nominal-cell">${val}</span>`;
-      if(key==="FOTO" && val) val=`<img src="${val}" style="max-width:60px">`;
-      return `<td>${val}</td>`;
-    }).join("");
-    tbody.appendChild(tr);
-  });
-}
-
-document.querySelectorAll("#menu button").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll("#menu button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    currentSheet=btn.dataset.sheet;
-    currentPage=1; currentKeyword="";
-    document.getElementById("searchBox").value="";
-    fetchData();
-  });
-});
-
-// initial load  
-fetchData(); 
 </script>
-
-
 
 </body>
 </html>
